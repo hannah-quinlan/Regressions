@@ -1,0 +1,63 @@
+library(readxl)
+Weddings <- read_excel("Documents/Homework 5/Weddings.xlsx",
+sheet = "Data", skip = 2)
+View(Weddings)
+
+plot(Weddings$Attendance,Weddings$`Wedding cost`)
+
+#Attach to just put in name of column instead of data and column
+attach(Weddings)
+plot(Attendance,`Wedding cost`, main = "Relationship between Attendance and Wedding Cost")
+detach(Weddings)
+
+#Pearson Correlation Coefficient
+cor(Attendance,`Wedding cost`)
+
+#Regression Model- Regressing Y on X
+regmodel = lm(`Wedding cost`~Attendance, data = Weddings)
+summary(regmodel)
+
+#Add regression line to plot
+plot(Weddings$Attendance,Weddings$`Wedding cost`)
+abline(regmodel)
+
+#Subset of just couples that paid for their wedding themselves
+CouplePaid = subset(Weddings, Weddings$Payor == "Bride & Groom")
+plot(CouplePaid$Attendance,CouplePaid$`Wedding cost`, main = "Attendance and Wedding Cost Relationship When Bride and Groom Paid", xlab = "Attendance", ylab = "Wedding Cost")
+
+#Confidence Intervals for regression model
+confint(regmodel, level=0.95)
+
+#values for regression model
+regmodel$fitted.values
+
+#predicted values for regression model (same as fitted values)
+predict(regmodel)
+
+#If attendance is 175 guests find the predicted wedding cost
+weddingattendance = data.frame(Attendance = c(175))
+predictions = predict(regmodel, weddingattendance)
+
+#Confidence interval for 175 guests
+conf_intervals = predict(regmodel, weddingattendance, interval = "confidence", level = 0.90)
+View(conf_intervals)
+
+#Prediction intervals for 175 guests
+pred_intervals = predict(regmodel, weddingattendance, interval = "prediction", level = 0.90)
+View(pred_intervals)
+
+#plot wedding attendance predictions
+plot(weddingattendance$Attendance, predictions, ylim = c(10000,50000),type="l")
+
+#plot 175 guest wedding cost confidence intervals (blue dotted line)
+#lower bound
+lines(weddingattendance$Attendance, conf_intervals[,2], lty=2, col="blue")
+#upper bound
+lines(weddingattendance$Attendance, conf_intervals[,3], lty=2, col="blue")
+
+#Plot 175 guest wedding cost prediction intervals (red dotted line)
+#lower bound
+lines(weddingattendance$Attendance, pred_intervals[,2], lty=2, col="red")
+#upper bound
+lines(weddingattendance$Attendance, pred_intervals[,3], lty=2, col="red")
+
