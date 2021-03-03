@@ -1,0 +1,51 @@
+#load the data
+library(readxl)
+Weddings <- read_excel("Documents/Homework 6/Weddings.xlsx",
+skip = 2)
+
+View(Weddings)
+summary(Weddings)
+attach(Weddings)
+
+#plot scatterplot with trendline
+plot(`Couple's Income`,`Wedding cost`)
+abline(lm(`Wedding cost`~`Couple's Income`))
+
+#plot scattermatrix
+plotdata = data.frame(Weddings[,1:2],Weddings[,4:5])
+plot(plotdata)
+
+#plot scattermatrix with trendlines
+pairs(plotdata)
+pairs(~Attendance+`Wedding cost`, data = plotdata)
+pairs(plotdata, lower.panel = panel.smooth, upper.panel = panel.smooth)
+
+#see correlation matrix
+cor(plotdata)
+
+#create regression model
+regmodel = lm(`Wedding cost`~`Couple's Income`+ `Bride's age`+ Attendance)
+summary(regmodel)
+
+#predict with regression model
+newdata = data.frame(`Couple's Income`= 100000, `Bride's age` = 24, Attendance = 175)
+predict(regmodel, newdata)
+
+#see the fit of model
+plot(regmodel)
+
+#Add all variables to model and compare
+full.model = lm(`Wedding cost`~`Couple's Income`+`Bride's age`+Attendance+Payor+`Value Rating`)
+summary(full.model)
+
+#Modify model by taking out least significant variable
+modified.model = lm(`Wedding cost`~`Couple's Income`+`Bride's age`+Attendance+Payor)
+summary(modified.model)
+
+#Use step to manually take out variables that are super insignificant
+step.model = step(full.model, direction="backward", trace=0, k=2)
+summary(step.model)
+step.model = step(full.model, direction="backward", trace=1, k=2)
+
+#check residual vs. fit
+plot(step.model)
