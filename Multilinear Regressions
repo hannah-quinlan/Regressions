@@ -49,3 +49,20 @@ step.model = step(full.model, direction="backward", trace=1, k=2)
 
 #check residual vs. fit
 plot(step.model)
+
+#Regression Model- Regressing Y on X to compare
+Attmodel = lm(`Wedding cost`~Attendance, data = Weddings)
+summary(Attmodel)
+
+#Regression Model- Regressing Y on X to compare
+Incmodel = lm(`Wedding cost`~`Couple's Income`, data = Weddings)
+summary(Incmodel)
+
+#test for multicollinearity-- greater than 4 or 10?
+install.packages("car")
+library("car")
+
+vif(lm(`Wedding cost`~`Couple's Income`+ `Bride's age`+ Attendance, data=plotdata))
+vif(lm(`Couple's Income`~`Wedding cost`+ `Bride's age`+ Attendance, data=plotdata))
+vif(lm(`Bride's age`~`Couple's Income`+`Wedding cost`+Attendance, data=plotdata))
+vif(lm(+Attendance~`Bride's age`+`Couple's Income`+`Wedding cost`, data=plotdata))
