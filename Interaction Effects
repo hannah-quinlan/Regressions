@@ -1,0 +1,25 @@
+library(readxl)
+HouseSales <- read_excel("Documents/Homework 7/HouseSales.xlsx",
+skip = 2)
+View(HouseSales)
+
+#Create Regression Model
+attach(HouseSales)
+regmodel = lm(`Selling Price`~`Lot Cost`+Region+Type)
+summary(regmodel)
+
+#Add interaction term
+intmodel1 = lm(`Selling Price`~`Lot Cost`+Region+Type+`Lot Cost`:Type)
+summary(intmodel1)
+
+intmodel2 = lm(`Selling Price`~Region+`Lot Cost`*Type)
+summary(intmodel2)
+
+#Create prediction models for different variables
+predmodel1 = data.frame(`Lot Cost`=30000, Region=factor(1,levels = 1:2, labels = c("Midwest", "South")), Type =factor(1,levels = 1:2, labels = c("Townhouse", "Single Family")))
+predmodel2 = data.frame(`Lot Cost`=30000, Region=factor(1,levels = 1:2, labels = c("Midwest", "South")), Type =factor(2,levels = 1:2, labels = c("Townhouse", "Single Family")))
+predmodel3 = data.frame(`Lot Cost`=30000, Region=factor(2,levels = 1:2, labels = c("Midwest", "South")), Type =factor(1,levels = 1:2, labels = c("Townhouse", "Single Family")))
+predmodel4 = data.frame(`Lot Cost`=30000, Region=factor(2,levels = 1:2, labels = c("Midwest", "South")), Type =factor(2,levels = 1:2, labels = c("Townhouse", "Single Family")))
+
+#Run prediction model
+predict(regmodel, predmodel1)
