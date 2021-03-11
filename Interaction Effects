@@ -16,10 +16,10 @@ intmodel2 = lm(`Selling Price`~Region+`Lot Cost`*Type)
 summary(intmodel2)
 
 #Create prediction models for different variables
-predmodel1 = data.frame(`Lot Cost`=30000, Region=factor(1,levels = 1:2, labels = c("Midwest", "South")), Type =factor(1,levels = 1:2, labels = c("Townhouse", "Single Family")))
-predmodel2 = data.frame(`Lot Cost`=30000, Region=factor(1,levels = 1:2, labels = c("Midwest", "South")), Type =factor(2,levels = 1:2, labels = c("Townhouse", "Single Family")))
-predmodel3 = data.frame(`Lot Cost`=30000, Region=factor(2,levels = 1:2, labels = c("Midwest", "South")), Type =factor(1,levels = 1:2, labels = c("Townhouse", "Single Family")))
-predmodel4 = data.frame(`Lot Cost`=30000, Region=factor(2,levels = 1:2, labels = c("Midwest", "South")), Type =factor(2,levels = 1:2, labels = c("Townhouse", "Single Family")))
+predmodel1 = expand.grid(`Lot Cost`=30000, Region=factor(1,levels = 1:2, labels = c("Midwest", "South")), Type =factor(1,levels = 1:2, labels = c("Townhouse", "Single Family")))
+predmodel2 = expand.grid(`Lot Cost`=30000, Region=factor(1,levels = 1:2, labels = c("Midwest", "South")), Type =factor(2,levels = 1:2, labels = c("Townhouse", "Single Family")))
+predmodel3 = expand.grid(`Lot Cost`=30000, Region=factor(2,levels = 1:2, labels = c("Midwest", "South")), Type =factor(1,levels = 1:2, labels = c("Townhouse", "Single Family")))
+predmodel4 = expand.grid(`Lot Cost`=30000, Region=factor(2,levels = 1:2, labels = c("Midwest", "South")), Type =factor(2,levels = 1:2, labels = c("Townhouse", "Single Family")))
 
 #Run prediction model
-predict(regmodel, predmodel1)
+predict(intmodel2, predmodel1)
