@@ -23,3 +23,12 @@ predmodel4 = expand.grid(`Lot Cost`=30000, Region=factor(2,levels = 1:2, labels 
 
 #Run prediction model
 predict(intmodel2, predmodel1)
+
+#Run prediction model
+predict(intmodel2, predmodel2)
+
+#Run prediction model
+predict(intmodel2, predmodel3)
+
+#Run prediction model
+predict(intmodel2, predmodel4)
