@@ -1,0 +1,74 @@
+library(readxl)
+BeerData <- read_excel("Documents/Case Study 2/AnadoluEfesData.xls",
+sheet = "Table A3", skip = 2)
+View(AnadoluEfesData)
+
+TourismData <- read_excel("Documents/Case Study 2/AnadoluEfesData.xls",
+sheet = "Table A4", skip = 2)
+View(TourismData)
+
+attach(BeerData)
+attach(TourismData)
+
+#Add ID to Beer Data
+BeerData <- head(BeerData,-3)
+ID <- seq.int(nrow(BeerData))
+BeerData <- cbind(BeerData,ID)
+
+#Add ID to Tourism Data
+TourismData <- cbind(TourismData,ID)
+
+# merge two data frames by ID
+TotalData <- merge(BeerData,TourismData,by="ID")
+View(TotalData)
+TotalData = subset(TotalData, select = -c(Year.y,Month.y) )
+
+#Make Time Series for Beer Data
+BeerDemand = ts(`Beer Consumption  (lt)`, start=c(1987,1), frequency = 12)
+
+#Plot Beer Demand
+options(scipen = 3)
+plot(BeerDemand, ylab = "Beer Demand (Liters)", main = "Beer Demand (1987-1993)")
+
+#plot scatterplot with trendline to show Beer Price and Consumption
+plot(`Average Beer Price*`,`Beer Consumption  (lt)`)
+abline(lm(`Beer Consumption  (lt)`~`Average Beer Price*`))
+
+#plot scattermatrix
+plotdata = data.frame(TotalData[,4:15])
+plot(plotdata)
+
+#plot scattermatrix with trendlines
+pairs(plotdata)
+pairs(plotdata, lower.panel = panel.smooth, upper.panel = panel.smooth)
+
+#plot correlation matrix
+cor(plotdata)
+
+#create regression model
+regmodel = lm(`Beer Consumption  (lt)`~`Average Beer Price*`+`Average Canned Beer Price*`+`Average Canned Soft Drink Price*`+`Average Draft Beer Price*`+`Average Raki Price*`+Czechoslovakia+Germany +`The United Kingdom`+`The United States`+France+`Others (Total)`,data= TotalData)
+summary(regmodel)
+
+#see the fit of model
+plot(regmodel2)
+
+#modify regression model
+regmodel2 = lm(`Beer Consumption  (lt)`~`Average Beer Price*`+`Average Canned Soft Drink Price*`+`Average Draft Beer Price*`+`Average Raki Price*`+Czechoslovakia+Germany +`The United Kingdom`+`The United States`+France+`Others (Total)`,data= TotalData)
+summary(regmodel2)
+
+#see the fit of modified model
+plot(regmodel2)
+
+#Use step to manually take out variables that are super insignificant
+step.model = step(regmodel, direction="backward", trace=0, k=2)
+summary(step.model)
+
+#check residual vs. fit
+plot(step.model)
+
+#test for multicollinearity-- greater than 4 or 10?
+install.packages("car")
+library("car")
+vif(step.model)
+
+
