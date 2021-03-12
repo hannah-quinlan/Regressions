@@ -71,4 +71,30 @@ install.packages("car")
 library("car")
 vif(step.model)
 
+#new model without multicollinearity variable
+fixmodel = lm(`Beer Consumption  (lt)` ~ `Average Canned Beer Price*` + `Average Canned Soft Drink Price*` + `Average Raki Price*` + Czechoslovakia + `The United Kingdom` + France, data = TotalData)
+summary(fixmodel)
+
+#New data frame with relevant variables for fixed model
+fixdata=data.frame(TotalData[,4], TotalData[,6:8],TotalData[,10],TotalData[,12],TotalData[,14])
+colnames(fixdata) <- c("Beer Consumption (lt)","Average Raki Price","Average Canned Soft Drink Price","Average Canned Beer Price","Czechoslovakia","The United Kingdom", "France")
+
+#check for correlation of relevant variables
+cor(fixdata)
+
+#vif fix model to check for multicollinearity
+vif(fixmodel)
+
+#plot to see fit
+plot(fixmodel)
+
+#step model to get rid of any other variables
+step.model2 = step(fixmodel, direction="backward", trace=0, k=2)
+summary(step.model2)
+
+#check for multicollinearity in final step model
+vif(step.model2)
+
+#plot to see fit
+plot(step.model2)
 
