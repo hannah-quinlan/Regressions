@@ -46,55 +46,48 @@ pairs(plotdata, lower.panel = panel.smooth, upper.panel = panel.smooth)
 cor(plotdata)
 
 #create regression model (1)
-regmodel = lm(`Beer Consumption  (lt)`~`Average Beer Price*`+`Average Canned Beer Price*`+`Average Canned Soft Drink Price*`+`Average Draft Beer Price*`+`Average Raki Price*`+Czechoslovakia+Germany +`The United Kingdom`+`The United States`+France+`Others (Total)`,data= TotalData)
+regmodel = lm(`Beer Consumption  (lt)`~Year.x + Month.x + `Average Beer Price*`+`Average Canned Beer Price*`+`Average Canned Soft Drink Price*`+`Average Draft Beer Price*`+`Average Raki Price*`+Czechoslovakia+Germany +`The United Kingdom`+`The United States`+France+`Others (Total)`,data= TotalData)
 summary(regmodel)
 
 #see the fit of model (1)
 plot(regmodel)
 
-#modify regression model (2)
-regmodel2 = lm(`Beer Consumption  (lt)`~`Average Beer Price*`+`Average Canned Soft Drink Price*`+`Average Draft Beer Price*`+`Average Raki Price*`+Czechoslovakia+Germany +`The United Kingdom`+`The United States`+France+`Others (Total)`,data= TotalData)
-summary(regmodel2)
-
-#see the fit of modified model (2)
-plot(regmodel2)
-
 #Use step to manually take out variables that are super insignificant (3)
 step.model = step(regmodel, direction="backward", trace=0, k=2)
 summary(step.model)
 
-#check residual vs. fit (3)
+#check residual vs. fit (2)
 plot(step.model)
 
-#test for multicollinearity-- greater than 4 or 10? (3)
+#test for multicollinearity-- greater than 4 or 10? (2)
 install.packages("car")
 library("car")
 vif(step.model)
 
-#new model without multicollinearity variable (4)
-fixmodel = lm(`Beer Consumption  (lt)` ~ `Average Canned Beer Price*` + `Average Canned Soft Drink Price*` + `Average Raki Price*` + Czechoslovakia + `The United Kingdom` + France, data = TotalData)
+#new model with log
+fixmodel = lm(log(`Beer Consumption  (lt)`) ~ Year.x + Month.x + `Average Beer Price*`+Czechoslovakia+Germany+`The United States`+France+`Others (Total)`, data = TotalData)
 summary(fixmodel)
 
 #New data frame with relevant variables for fixed model 
-fixdata=data.frame(TotalData[,4], TotalData[,6:8],TotalData[,10],TotalData[,12],TotalData[,14])
-colnames(fixdata) <- c("Beer Consumption (lt)","Average Raki Price","Average Canned Soft Drink Price","Average Canned Beer Price","Czechoslovakia","The United Kingdom", "France")
+fixdata=data.frame(TotalData[,1],TotalData[,4:5],TotalData[,10:11],TotalData[,13:15])
+colnames(fixdata) <- c("MonthID", "Beer Consumption (lt)","Average Beer Price","Czechoslovakia","Germany", "The United States", "France","Others (Total)")
 
 #check for correlation of relevant variables
 cor(fixdata)
 
-#vif fix model to check for multicollinearity (4)
+#vif fix model to check for multicollinearity (3)
 vif(fixmodel)
 
-#plot to see fit (4)
+#plot to see fit (3)
 plot(fixmodel)
 
-#step model to get rid of any other variables (5)
+#step model to get rid of any other variables (4)
 step.model2 = step(fixmodel, direction="backward", trace=0, k=2)
 summary(step.model2)
 
-#check for multicollinearity in final step model (5)
+#check for multicollinearity in final step model (4)
 vif(step.model2)
 
-#plot to see fit (5)
+#plot to see fit (4)
 plot(step.model2)
 
