@@ -1,0 +1,69 @@
+library(readxl)
+Train.Data <- read_excel("Documents/Homework 8/Purchase.xlsx")
+View(Train.Data)
+
+#Change Purchase to a factor that has levels 0 and 1
+Train.Data$Purchase = as.factor(Train.Data$Purchase)
+Train.Data$Purchase = factor(Train.Data$Purchase, levels = c("0","1"))
+Train.Data$Purchase = as.numeric(Train.Data$Purchase)-1
+
+#Make Linear Probability Model
+lpmodel = lm(Train.Data$Purchase ~ Train.Data$Age)
+summary(lpmodel)
+plot(lpmodel)
+
+#Plot relationship between age and purchase decision
+plot(Train.Data$Age,Train.Data$Purchase,xlab="Age",ylab= "Purchase Decision (Purchase =1)",main="Purchase Decision vs. Age")
+plot(Train.Data$Age,Train.Data$Purchase,xlab="Age",ylab= "Purchase Decision (Purchase =1)",main="Purchase Decision vs. Age", ylim=c(-0.5,1.5))
+
+#Add LP model to chart
+abline(lpmodel)
+
+#Look at probabilities for LP model
+lpmodel$fitted.values
+predict(lpmodel)
+
+#Add line to chart show cut off 
+abline(h=0.5,lty=2, col="blue")
+
+#Find binary predictions (Prediction classes) for purchase decision 
+predicted_decision = ifelse(lpmodel$fitted.values>=0.5, 1,0)
+
+#Plot predicted decisions on chart
+points(Train.Data$Age,predicted_decision,col="red",pch=19)
+
+#Create log model
+logmodel = glm(Train.Data$Purchase~Train.Data$Age, family = "binomial")
+logmodel = glm(Train.Data$Purchase~Train.Data$Age, family = binomial(link="logit"))
+summary(logmodel)
+
+#Find predicted probabilities that there will be a purchase for each observation in our dataset
+logmodel$fitted.values
+predict(logmodel, type="response")
+pred_prob = predict(logmodel, type = "response")
+
+#Find log-odds ratios (NOT predicted probabilties)
+predict(logmodel)
+pred_logodds = predict(logmodel)
+
+#Turns log odds into predicted probabilties
+exp(pred_logodds)/(1+exp(pred_logodds))
+
+#Turns predicted probabilities into log odds
+log(pred_prob/(1-pred_prob))
+
+#Creat Prediction Class (Anything above 0.5 is a predicted purchase)
+pred_class = ifelse(pred_prob>=0.5,1,0)
+
+#Creates log model using all variables
+logmodel = glm(Train.Data$Purchase~., data = Train.Data, family="binomial")
+logmodel = glm(Train.Data$Purchase~Train.Data$Age,family="binomial")
+summary(logmodel)
+
+#Run a step model to make sure the model is robust
+step.model = step(logmodel, direct="backward")
+summary(step.model)
+
+
+min(Age)
+max(Age)
