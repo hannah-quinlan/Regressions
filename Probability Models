@@ -46,6 +46,9 @@ pred_prob = predict(logmodel, type = "response")
 predict(logmodel)
 pred_logodds = predict(logmodel)
 
+#Find logodds for each variable (This is the expected increase in odds for a 1-unit increase in the predictor)
+exp(coef(logmodel))
+
 #Turns log odds into predicted probabilties
 exp(pred_logodds)/(1+exp(pred_logodds))
 
