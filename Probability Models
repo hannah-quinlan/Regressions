@@ -1,20 +1,21 @@
 library(readxl)
 Train.Data <- read_excel("Documents/Homework 8/Purchase.xlsx")
 View(Train.Data)
+Attach(Train.Data)
 
 #Change Purchase to a factor that has levels 0 and 1
-Train.Data$Purchase = as.factor(Train.Data$Purchase)
-Train.Data$Purchase = factor(Train.Data$Purchase, levels = c("0","1"))
-Train.Data$Purchase = as.numeric(Train.Data$Purchase)-1
+Purchase = as.factor(Purchase)
+Purchase = factor(Purchase, levels = c("0","1"))
+Purchase = as.numeric(Purchase)-1
 
 #Make Linear Probability Model
-lpmodel = lm(Train.Data$Purchase ~ Train.Data$Age)
+lpmodel = lm(Purchase ~ Age)
 summary(lpmodel)
 plot(lpmodel)
 
 #Plot relationship between age and purchase decision
-plot(Train.Data$Age,Train.Data$Purchase,xlab="Age",ylab= "Purchase Decision (Purchase =1)",main="Purchase Decision vs. Age")
-plot(Train.Data$Age,Train.Data$Purchase,xlab="Age",ylab= "Purchase Decision (Purchase =1)",main="Purchase Decision vs. Age", ylim=c(-0.5,1.5))
+plot(Age,Purchase,xlab="Age",ylab= "Purchase Decision (Purchase =1)",main="Purchase Decision vs. Age")
+plot(Age,Purchase,xlab="Age",ylab= "Purchase Decision (Purchase =1)",main="Purchase Decision vs. Age", ylim=c(-0.5,1.5))
 
 #Add LP model to chart
 abline(lpmodel)
@@ -30,11 +31,11 @@ abline(h=0.5,lty=2, col="blue")
 predicted_decision = ifelse(lpmodel$fitted.values>=0.5, 1,0)
 
 #Plot predicted decisions on chart
-points(Train.Data$Age,predicted_decision,col="red",pch=19)
+points(Age,predicted_decision,col="red",pch=19)
 
 #Create log model
-logmodel = glm(Train.Data$Purchase~Train.Data$Age, family = "binomial")
-logmodel = glm(Train.Data$Purchase~Train.Data$Age, family = binomial(link="logit"))
+logmodel = glm(Purchase~Age, family = "binomial")
+logmodel = glm(Purchase~Age, family = binomial(link="logit"))
 summary(logmodel)
 
 #Find predicted probabilities that there will be a purchase for each observation in our dataset
@@ -59,14 +60,22 @@ log(pred_prob/(1-pred_prob))
 pred_class = ifelse(pred_prob>=0.5,1,0)
 
 #Creates log model using all variables
-logmodel = glm(Train.Data$Purchase~., data = Train.Data, family="binomial")
-logmodel = glm(Train.Data$Purchase~Train.Data$Age,family="binomial")
+logmodel = glm(Purchase~., data = Train.Data, family="binomial")
+logmodel = glm(Purchase~Age,family="binomial")
 summary(logmodel)
 
 #Run a step model to make sure the model is robust
 step.model = step(logmodel, direct="backward")
 summary(step.model)
 
-
+#Find youngest and oldest
 min(Age)
 max(Age)
+
+#Find predictions for youngest, oldest, 20yrs old, and 30yrs old
+predmodel <- expand.grid(Age = c(16,45,20,30), data = Train.Data)
+predict(logmodel, predmodel, type = "response")
+
+#Compare 20yrs and 30yrs
+0.47-0.21
+
