@@ -1,7 +1,7 @@
 library(readxl)
 Train.Data <- read_excel("Documents/Homework 8/Purchase.xlsx")
 View(Train.Data)
-Attach(Train.Data)
+attach(Train.Data)
 
 #Change Purchase to a factor that has levels 0 and 1
 Purchase = as.factor(Purchase)
