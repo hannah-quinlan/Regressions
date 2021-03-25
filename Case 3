@@ -1,0 +1,85 @@
+library(readxl)
+EmployeeAttrition_data <- read_excel("Documents/Case Study 3/EmployeeAttrition_data.xlsx",
+col_types = c("numeric", "text", "text",
+"skip", "text", "numeric", "numeric",
+"text", "skip", "skip", "numeric",
+"text", "skip", "numeric", "numeric",
+"text", "numeric", "text", "numeric",
+"skip", "numeric", "skip", "text",
+"numeric", "numeric", "numeric",
+"numeric", "numeric", "numeric",
+"numeric", "numeric", "numeric",
+"numeric", "numeric", "numeric"))
+View(EmployeeAttrition_data)
+attach(EmployeeAttrition_data)
+
+#Change some variables to factors
+BusinessTravel=as.factor(BusinessTravel)
+Department=as.factor(Department)
+Education=as.factor(Education)
+EducationField=as.factor(EducationField)
+EnvironmentSatisfaction=as.factor(EnvironmentSatisfaction)
+Gender=as.factor(Gender)
+JobInvolvement=as.factor(JobInvolvement)
+JobLevel=as.factor(JobLevel)
+JobRole=as.factor(JobRole)
+JobSatisfaction=as.factor(JobSatisfaction)
+MaritalStatus=as.factor(MaritalStatus)
+OverTime=as.factor(OverTime)
+StockOptionLevel=as.factor(StockOptionLevel)
+RelationshipSatisfaction=as.factor(RelationshipSatisfaction)
+WorkLifeBalance=as.factor(WorkLifeBalance)
+
+#Change Attrition to a factor that has levels 0 and 1
+Attrition = factor(Attrition, levels = c("No","Yes"))
+Attrition.num = as.numeric(Attrition)
+Attrition.num = as.numeric(Attrition)-1
+Attrition.num
+
+#Create LP model using all variables
+lpmodel = lm(Attrition.num~.-Attrition,data =EmployeeAttrition_data)
+summary(lpmodel)
+plot(lpmodel)
+
+#Look at probabilities for LP model
+lpmodel$fitted.values
+predict(lpmodel)
+
+#Run a step model to make sure the LP model is robust
+lp.step.model = step(lpmodel, direct="backward")
+summary(lp.step.model)
+plot(lp.step.model)
+
+#Creates log model using all variables
+logmodel = glm(Attrition.num~.-Attrition, data = EmployeeAttrition_data, family="binomial")
+summary(logmodel)
+plot(logmodel)
+
+#Run a step model to make sure the log model is robust
+step.model = step(logmodel, direct="backward")
+summary(step.model)
+plot(step.model)
+
+#Find predicted probabilities that there will be a purchase for each observation in our dataset
+logmodel$fitted.values
+predict(logmodel, type="response")
+pred_prob = predict(logmodel, type = "response")
+
+#Find log-odds ratios (NOT predicted probabilties)
+predict(logmodel)
+pred_logodds = predict(logmodel)
+
+#Find logodds for each variable (This is the expected increase in odds for a 1-unit increase in the predictor)
+exp(coef(logmodel))
+
+#Creat Prediction Class (Anything above 0.5 is a predicted purchase)
+pred_class = ifelse(pred_prob>=0.5,1,0)
+
+#Find predictions for youngest, oldest, 20yrs old, and 30yrs old
+predmodel <- expand.grid(Age = c(16,45,20,30), data = EmployeeAttrition_data)
+predict(logmodel, predmodel, type = "response")
+
+#Find predictions for youngest, oldest, 20yrs old, and 30yrs old
+predmodel <- expand.grid(Age = c(16,45,20,30), data = EmployeeAttrition_data)
+predict(logmodel, predmodel, type = "response")
+logmodel$fitted.values
