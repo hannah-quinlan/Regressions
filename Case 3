@@ -32,6 +32,7 @@ OverTime=as.factor(OverTime)
 StockOptionLevel=as.factor(StockOptionLevel)
 RelationshipSatisfaction=as.factor(RelationshipSatisfaction)
 WorkLifeBalance=as.factor(WorkLifeBalance)
+PerformanceRating <- as.factor(PerformanceRating)
 
 #Change Attrition to a factor that has levels 0 and 1
 Attrition = factor(Attrition, levels = c("No","Yes"))
@@ -65,16 +66,42 @@ logmodel$fitted.values
 predict(logmodel, type="response")
 pred_prob = predict(step.model, type = "response")
 
-#Find log-odds ratios (NOT predicted probabilties)
-predict(step.model)
-pred_logodds = predict(step.model)
+#ROC
+library(ROCR)
+pred <- prediction(pred_prob, EmployeeAttrition$Attrition.num, label.ordering = c("0", "1"))
+roc <- performance(pred, measure = "tpr", x.measure = "fpr")
+plot(roc)
+abline(a=0, b=1)
+roc
 
-#Find logodds for each variable (This is the expected increase in odds for a 1-unit increase in the predictor)
-exp(coef(step.model))
+#make roc dataframe
+rocdata <- data.frame(fpr=roc@x.values[[1]], tpr=roc@y.values[[1]], cutoff=roc@alpha.values)
+
+#area under ROC curve
+auc <- performance(pred, measure = "auc")
+auc
 
 #Creat Prediction Class (Anything above 0.5 is a predicted attrition)
 pred_class = ifelse(pred_prob>=0.5,1,0)
+pred_class
 
-#Find predictions for ages as a test
-predmodel <- expand.grid(Age = c(20,30,40,50), data = EmployeeAttrition)
-predict(step.model, predmodel, type = "response")
+#pick cutoff based on highest acuracy
+accuracy=performance(pred, measure="acc")
+accuracy
+plot(accuracy)
+
+#add gridlines to better see cutoff values
+grid(nx = NULL, ny = nx, col = "lightgray", lty = "dotted",     
+lwd = par("lwd"), equilogs = TRUE)
+
+#create lift chart
+lift=performance(pred, measure="lift", x.measure ="rpp")
+plot(lift)
+
+#add gridlines to better see cutoff values
+grid(nx = NULL, ny = nx, col = "lightgray", lty = "dotted",     
+lwd = par("lwd"), equilogs = TRUE)
+
+
+
+
